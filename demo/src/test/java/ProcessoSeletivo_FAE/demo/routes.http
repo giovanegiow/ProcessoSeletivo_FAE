@@ -1,0 +1,258 @@
+# Rotas da API - rode na ordem, com o backend no ar (./mvnw spring-boot:run).
+# O banco H2 começa vazio a cada inicialização: o aluno criado abaixo recebe id 1
+# e o professor recebe id 2.
+
+@baseUrl = http://localhost:8080
+
+# =====================================================================
+# ALUNO (/student)
+# =====================================================================
+
+### 1. Criar aluno (espera 201)
+POST {{baseUrl}}/student
+Content-Type: application/json
+
+{
+  "name": "Ana Souza",
+  "phoneNumber": "(41) 99999-1234",
+  "emailAddress": "ana@email.com",
+  "status": "ACTIVE",
+  "studentNumber": 2024001,
+  "addresses": [
+    {
+      "street": "Rua A, 10",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+### 2. Listar alunos (espera 200)
+GET {{baseUrl}}/student
+
+### 3. Buscar aluno por id (espera 200)
+GET {{baseUrl}}/student/1
+
+### 4. Editar aluno - manda TODOS os campos (espera 200)
+PUT {{baseUrl}}/student/1
+Content-Type: application/json
+
+{
+  "name": "Ana Souza Lima",
+  "phoneNumber": "(41) 98888-0000",
+  "emailAddress": "ana.lima@email.com",
+  "status": "DISABLE",
+  "studentNumber": 2024001,
+  "addresses": [
+    {
+      "street": "Rua A, 10",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    },
+    {
+      "street": "Rua B, 20",
+      "city": "Joinville",
+      "state": "SC",
+      "zipCode": "89200-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+# =====================================================================
+# PROFESSOR (/professor)
+# =====================================================================
+
+### 5. Criar professor (espera 201)
+POST {{baseUrl}}/professor
+Content-Type: application/json
+
+{
+  "name": "Carla Mendes",
+  "phoneNumber": "(41) 3333-4444",
+  "emailAddress": "carla@email.com",
+  "status": "ACTIVE",
+  "salary": 8500.50,
+  "addresses": [
+    {
+      "street": "Av. Brasil, 500",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80010-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+### 6. Listar professores (espera 200)
+GET {{baseUrl}}/professor
+
+### 7. Buscar professor por id (espera 200)
+GET {{baseUrl}}/professor/2
+
+### 8. Editar professor - aumento de salário (espera 200)
+PUT {{baseUrl}}/professor/2
+Content-Type: application/json
+
+{
+  "name": "Carla Mendes",
+  "phoneNumber": "(41) 3333-4444",
+  "emailAddress": "carla@email.com",
+  "status": "ACTIVE",
+  "salary": 9500.00,
+  "addresses": [
+    {
+      "street": "Av. Brasil, 500",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80010-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+# =====================================================================
+# PESSOA (/person) - alunos e professores juntos
+# =====================================================================
+
+### 9. Listar todas as pessoas (espera 200, com "type" em cada uma)
+GET {{baseUrl}}/person
+
+### 10. Buscar pessoa por id - aqui o 2 é a professora (espera 200)
+GET {{baseUrl}}/person/2
+
+# =====================================================================
+# ERROS - 404 (id não existe)
+# =====================================================================
+
+### 11. Buscar aluno que não existe (espera 404)
+GET {{baseUrl}}/student/999
+
+### 12. Buscar como aluno um id que é de professor (espera 404)
+GET {{baseUrl}}/student/2
+
+### 13. Editar professor que não existe (espera 404)
+PUT {{baseUrl}}/professor/999
+Content-Type: application/json
+
+{
+  "name": "Ninguém",
+  "phoneNumber": "(41) 0000-0000",
+  "emailAddress": "ninguem@email.com",
+  "status": "ACTIVE",
+  "salary": 1000.00,
+  "addresses": [
+    {
+      "street": "Rua X",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+### 14. Apagar aluno que não existe (espera 404)
+DELETE {{baseUrl}}/student/999
+
+# =====================================================================
+# ERROS - 400 (dados inválidos)
+# =====================================================================
+
+### 15. Criar aluno sem nada (espera 400 com todos os campos obrigatórios)
+POST {{baseUrl}}/student
+Content-Type: application/json
+
+{}
+
+### 16. E-mail inválido e sem endereço (espera 400)
+POST {{baseUrl}}/student
+Content-Type: application/json
+
+{
+  "name": "Bruno Lima",
+  "phoneNumber": "(41) 97777-1111",
+  "emailAddress": "email-invalido",
+  "status": "ACTIVE",
+  "studentNumber": 2024002,
+  "addresses": []
+}
+
+### 17. Endereço incompleto, sem cidade (espera 400)
+POST {{baseUrl}}/student
+Content-Type: application/json
+
+{
+  "name": "Bruno Lima",
+  "phoneNumber": "(41) 97777-1111",
+  "emailAddress": "bruno@email.com",
+  "status": "ACTIVE",
+  "studentNumber": 2024002,
+  "addresses": [
+    {
+      "street": "Rua C, 30",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+### 18. Professor com salário negativo (espera 400)
+POST {{baseUrl}}/professor
+Content-Type: application/json
+
+{
+  "name": "Pedro Alves",
+  "phoneNumber": "(41) 96666-2222",
+  "emailAddress": "pedro@email.com",
+  "status": "ACTIVE",
+  "salary": -100,
+  "addresses": [
+    {
+      "street": "Rua D, 40",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+### 19. Status que não existe no enum (espera 400)
+POST {{baseUrl}}/student
+Content-Type: application/json
+
+{
+  "name": "Bruno Lima",
+  "phoneNumber": "(41) 97777-1111",
+  "emailAddress": "bruno@email.com",
+  "status": "PAUSADO",
+  "studentNumber": 2024002,
+  "addresses": [
+    {
+      "street": "Rua C, 30",
+      "city": "Curitiba",
+      "state": "PR",
+      "zipCode": "80000-000",
+      "country": "Brasil"
+    }
+  ]
+}
+
+# =====================================================================
+# APAGAR (por último, para não atrapalhar os testes acima)
+# =====================================================================
+
+### 20. Apagar aluno - os endereços dele vão junto (espera 204)
+DELETE {{baseUrl}}/student/1
+
+### 21. Apagar professor (espera 204)
+DELETE {{baseUrl}}/professor/2
+
+### 22. Listar de novo - deve voltar vazio (espera 200 com [])
+GET {{baseUrl}}/person
