@@ -3,11 +3,20 @@
 import { useState } from 'react';
 import { AddressFields, emptyAddress, type Address } from './AddressFields';
 
-type PersonType = 'STUDENT' | 'PROFESSOR';
+type Person = {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  emailAddress: string;
+  status: 'ACTIVE' | 'DISABLE';
+  type: TypePerson
+};
+
+type TypePerson = 'PERSON' | 'STUDENT' | 'PROFESSOR';
 type Status = 'ACTIVE' | 'DISABLE';
 
 export function PersonForm() {
-  const [type, setType] = useState<PersonType>('STUDENT');
+  const [type, setType] = useState<TypePerson>('STUDENT');
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -37,17 +46,18 @@ export function PersonForm() {
     const response = await fetch(type === 'STUDENT' ? '/api/student' : '/api/professor', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body), // sem chaves em volta do body
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      // O backend devolve { "campo": "mensagem" } quando a validação falha
+
       const erros = await response.json();
       setMensagem('Erro ao cadastrar: ' + Object.values(erros).join(', '));
       return;
     }
 
     setMensagem('Cadastrado com sucesso!');
+    window.location.reload();
   }
 
   return (
@@ -147,4 +157,8 @@ function ShowProfessor({ salary, onChange }: { salary: string; onChange: (v: str
       </div>
     </fieldset>
   );
+}
+
+export function EditarPessoa(pessoa: Person){
+
 }
