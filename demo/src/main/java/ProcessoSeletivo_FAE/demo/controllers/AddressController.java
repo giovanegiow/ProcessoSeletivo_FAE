@@ -1,3 +1,5 @@
+package ProcessoSeletivo_FAE.demo.controllers;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/person")
-public class PersonController {
+@RequestMapping(value = "/address")
+public class AddressController {
     @Autowired
-    private PersonService service;
+    private AddressService service;
 
     @PostMapping
-    public ResponseEntity<Person> create(@RequestBody Person obj){
+    public ResponseEntity<Address> create(@RequestBody Address obj){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(obj));
     }
 
@@ -25,17 +27,12 @@ public class PersonController {
     }
 
     @GetMapping(value = "/{id_person}")
-    public ResponseEntity<Person> selectById(@PathVariable  Long id_person){
+    public ResponseEntity<Address> selectById(@PathVariable  Long id_person){
         return ResponseEntity.ok().body(service.selectById(id_person));
     }
 
-    @GetMapping 
-    public ResponseEntity<List<Person>> selectAll(){
-        return ResponseEntity.ok().body(service.selectAll());
-    }
-
     @PutMapping(value = "/{id_person}")
-    public ResponseEntity<Person> update(@PathVariable Long id_person, @RequestBody Person obj){
+    public ResponseEntity<Address> update(@PathVariable Long id_person, @RequestBody Address obj){
         obt.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }

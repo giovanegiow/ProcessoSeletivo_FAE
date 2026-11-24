@@ -1,3 +1,5 @@
+package ProcessoSeletivo_FAE.demo.entities;
+
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;
@@ -15,11 +17,7 @@ import lombok.Setter;
 
 @Entity
 
-public class Address implements Serializable {
+public class Professor {
     private Long id_person;
-    private String street;
-    private String city;
-    private String state;
-    private String zipCode;
-    private String country;
+    private Float street;
 }

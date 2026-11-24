@@ -1,3 +1,5 @@
+package ProcessoSeletivo_FAE.demo.entities;
+
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;
@@ -14,8 +16,14 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "id_person")
 
 @Entity
-
-public class Professor {
+public class Person implements Serializable {
+    @id_person
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_person;
-    private Float street;
+    private String name;
+    private String phoneNumber;
+    private String emailAddress;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
 }
