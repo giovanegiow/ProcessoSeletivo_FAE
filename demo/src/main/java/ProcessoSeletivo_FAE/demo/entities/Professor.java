@@ -13,11 +13,11 @@ import lombok.Setter;
 @NoArgsConstructor 
 @Getter 
 @Setter
-@EqualsAndHashCode(of = "id_person")
+@EqualsAndHashCode(of = "id")
 
 @Entity
 
 public class Professor {
-    private Long id_person;
+    private Long id;
     private Float street;
 }

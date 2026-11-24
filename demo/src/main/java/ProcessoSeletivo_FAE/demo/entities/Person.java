@@ -17,13 +17,13 @@ import lombok.Setter;
 @NoArgsConstructor 
 @Getter 
 @Setter
-@EqualsAndHashCode(of = "id_person")
+@EqualsAndHashCode(of = "id")
 
 @Entity
 public class Person implements Serializable {
     @id_person
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_person;
+    private Long id;
     private String name;
     private String phoneNumber;
     private String emailAddress;

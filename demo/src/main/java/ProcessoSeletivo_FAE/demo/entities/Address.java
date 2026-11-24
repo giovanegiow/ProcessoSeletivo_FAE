@@ -13,12 +13,12 @@ import lombok.Setter;
 @NoArgsConstructor 
 @Getter 
 @Setter
-@EqualsAndHashCode(of = "id_person")
+@EqualsAndHashCode(of = "id")
 
 @Entity
 
 public class Address implements Serializable {
-    private Long id_person;
+    private Long id;
     private String street;
     private String city;
     private String state;

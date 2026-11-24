@@ -38,7 +38,7 @@ public class AddressController {
 
     @PutMapping(value = "/{id_person}")
     public ResponseEntity<Address> update(@PathVariable Long id_person, @RequestBody Address obj){
-        obt.setId(id_person);
+        obj.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }
 }

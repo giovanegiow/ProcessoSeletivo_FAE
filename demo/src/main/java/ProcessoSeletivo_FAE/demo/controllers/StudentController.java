@@ -45,7 +45,7 @@ public class StudentController {
 
     @PutMapping(value = "/{id_person}")
     public ResponseEntity<Student> update(@PathVariable Long id_person, @RequestBody Student obj){
-        obt.setId(id_person);
+        obj.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }
 }
