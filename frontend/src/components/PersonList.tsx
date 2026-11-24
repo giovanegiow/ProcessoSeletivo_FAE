@@ -1,18 +1,33 @@
 // Tela de listagem — apenas visual. Os dados abaixo são placeholders estáticos.
+import { useEffect, useState } from 'react';
+
+type Person = {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  emailAddress: string;
+  status: 'ACTIVE' | 'DISABLE';
+  type: 'STUDENT' | 'PROFESSOR';
+};
 
 export function PersonList() {
+  const numPerson = SearchTotalPerson();
+
+  const numStudents = numPerson.filter((p) => p.type === 'STUDENT').length;
+  const numProfessors = numPerson.filter((p) => p.type === 'PROFESSOR').length;
+  
   return (
     <section className="card">
       <div className="toolbar">
         <div className="tabs" role="tablist">
           <button role="tab" className="active">
-            Todos <span className="count">3</span>
+            Todos <span className="count">{numPerson.length}</span>
           </button>
           <button role="tab">
-            Alunos <span className="count">2</span>
+            Alunos <span className="count">{numStudents}</span>
           </button>
           <button role="tab">
-            Professores <span className="count">1</span>
+            Professores <span className="count">{numProfessors}</span>
           </button>
         </div>
         <div className="toolbar-right">
@@ -35,74 +50,7 @@ export function PersonList() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td data-label="Nome">
-                <div className="person-cell">
-                  <div className="avatar"><span>AS</span></div>
-                  <span>Ana Souza</span>
-                </div>
-              </td>
-              <td data-label="Tipo"><span className="tag tag-student">Aluno</span></td>
-              <td data-label="Contato">
-                <div>
-                  <div>ana.souza@email.com</div>
-                  <div className="muted">(41) 99999-1234</div>
-                </div>
-              </td>
-              <td data-label="Detalhe">Matrícula 2024001</td>
-              <td data-label="Cidade">Curitiba/PR</td>
-              <td data-label="Status"><span className="badge badge-on">Ativo</span></td>
-              <td className="actions">
-                <button className="btn btn-ghost btn-sm">Editar</button>
-                <button className="btn btn-danger-ghost btn-sm">Excluir</button>
-              </td>
-            </tr>
-            <tr>
-              <td data-label="Nome">
-                <div className="person-cell">
-                  <div className="avatar"><span>BL</span></div>
-                  <span>Bruno Lima</span>
-                </div>
-              </td>
-              <td data-label="Tipo"><span className="tag tag-student">Aluno</span></td>
-              <td data-label="Contato">
-                <div>
-                  <div>bruno.lima@email.com</div>
-                  <div className="muted">(41) 98888-5678</div>
-                </div>
-              </td>
-              <td data-label="Detalhe">Matrícula 2024002</td>
-              <td data-label="Cidade">
-                <span>São José dos Pinhais/PR <span className="muted">+1</span></span>
-              </td>
-              <td data-label="Status"><span className="badge badge-off">Desativado</span></td>
-              <td className="actions">
-                <button className="btn btn-ghost btn-sm">Editar</button>
-                <button className="btn btn-danger-ghost btn-sm">Excluir</button>
-              </td>
-            </tr>
-            <tr>
-              <td data-label="Nome">
-                <div className="person-cell">
-                  <div className="avatar"><span>CM</span></div>
-                  <span>Carla Mendes</span>
-                </div>
-              </td>
-              <td data-label="Tipo"><span className="tag tag-professor">Professor</span></td>
-              <td data-label="Contato">
-                <div>
-                  <div>carla.mendes@email.com</div>
-                  <div className="muted">(41) 3333-4444</div>
-                </div>
-              </td>
-              <td data-label="Detalhe">R$ 8.500,00</td>
-              <td data-label="Cidade">Curitiba/PR</td>
-              <td data-label="Status"><span className="badge badge-on">Ativo</span></td>
-              <td className="actions">
-                <button className="btn btn-ghost btn-sm">Editar</button>
-                <button className="btn btn-danger-ghost btn-sm">Excluir</button>
-              </td>
-            </tr>
+            <SearchPerson />
           </tbody>
         </table>
       </div>
@@ -120,4 +68,98 @@ export function PersonListEmpty() {
       </div>
     </section>
   );
+}
+
+function iniciais(nome: string) {
+  return nome
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0].toUpperCase())
+    .join('');
+}
+
+function SearchPerson() {
+  const [pessoas, setPessoas] = useState<Person[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/person')
+      .then((resposta) => {
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+        return resposta.json();
+      })
+      .then((dados: Person[]) => setPessoas(dados))
+      .catch((e) => setErro(String(e)));
+  }, []);
+
+  if (erro) {
+    return (
+      <tr>
+        <td colSpan={7} className="error">Erro ao buscar pessoas: {erro}</td>
+      </tr>
+    );
+  }
+
+  if (pessoas.length === 0) {
+    return (
+      <tr>
+        <td colSpan={7} className="empty">Nenhuma pessoa cadastrada ainda.</td>
+      </tr>
+    );
+  }
+
+  return (
+    <>
+      {pessoas.map((pessoa) => (
+        <tr key={pessoa.id}>
+          <td data-label="Nome">
+            <div className="person-cell">
+              <div className="avatar"><span>{iniciais(pessoa.name)}</span></div>
+              <span>{pessoa.name}</span>
+            </div>
+          </td>
+          <td data-label="Tipo">—</td>
+          <td data-label="Contato">
+            <div>
+              <div>{pessoa.emailAddress}</div>
+              <div className="muted">{pessoa.phoneNumber}</div>
+            </div>
+          </td>
+          <td data-label="Detalhe">—</td>
+          <td data-label="Cidade">—</td>
+          <td data-label="Status">
+            {pessoa.status === 'ACTIVE'
+              ? <span className="badge badge-on">Ativo</span>
+              : <span className="badge badge-off">Desativado</span>}
+          </td>
+          <td className="actions">
+            <button className="btn btn-ghost btn-sm">Editar</button>
+            <button className="btn btn-danger-ghost btn-sm">Excluir</button>
+          </td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
+function SearchTotalPerson(){
+  const [pessoas, setPessoas] = useState<Person[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
+  
+  useEffect(() => {
+    fetch('/api/person')
+      .then((resposta) => {
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+        return resposta.json();
+      })
+      .then((dados: Person[]) => setPessoas(dados))
+      .catch((e) => setErro(String(e)));
+  }, []);
+
+  if (erro) {
+    console.log("Erro ao completar requisição!");
+  }
+
+  return pessoas;
 }

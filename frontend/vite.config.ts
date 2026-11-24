@@ -4,4 +4,14 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      // Tudo que começar com /api é repassado para o Spring Boot
+      '/api': {
+        target: 'http://localhost:8080',
+        // Tira o "/api" antes de repassar: /api/person -> /person
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

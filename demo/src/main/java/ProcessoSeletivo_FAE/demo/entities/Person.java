@@ -8,11 +8,14 @@ import java.io.Serializable;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 @AllArgsConstructor 
 @NoArgsConstructor 
 @Getter 
@@ -20,8 +23,9 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "id")
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED) 
 public class Person implements Serializable {
-    @id_person
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
@@ -30,4 +34,8 @@ public class Person implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
+
+    public String getType() {          
+        return "PERSON";
+    }
 }

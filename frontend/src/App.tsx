@@ -22,8 +22,8 @@ export default function App() {
         <h2 className="screen-label">Tela: Listagem</h2>
         <PersonList />
 
-        <h2 className="screen-label">Tela: Listagem vazia</h2>
-        <PersonListEmpty />
+        {/* <h2 className="screen-label">Tela: Listagem vazia</h2>
+        <PersonListEmpty /> */}
 
         <h2 className="screen-label">Tela: Formulário</h2>
         <PersonForm />
