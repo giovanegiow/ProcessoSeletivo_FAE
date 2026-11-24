@@ -1,6 +1,7 @@
 package ProcessoSeletivo_FAE.demo.entities;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,5 +24,5 @@ public class Professor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Float street;
+    private BigDecimal salary; // BigDecimal para dinheiro: Float tem erro de arredondamento
 }
