@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 import ProcessoSeletivo_FAE.demo.entities.Student;
 import ProcessoSeletivo_FAE.demo.services.StudentService;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class StudentController {
     private StudentService service;
 
     @PostMapping
-    public ResponseEntity<Student> create(@RequestBody Student obj){
+    public ResponseEntity<Student> create(@Valid @RequestBody Student obj){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(obj));
     }
 
@@ -44,7 +45,7 @@ public class StudentController {
     }
 
     @PutMapping(value = "/{id_person}")
-    public ResponseEntity<Student> update(@PathVariable Long id_person, @RequestBody Student obj){
+    public ResponseEntity<Student> update(@PathVariable Long id_person, @Valid @RequestBody Student obj){
         obj.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }

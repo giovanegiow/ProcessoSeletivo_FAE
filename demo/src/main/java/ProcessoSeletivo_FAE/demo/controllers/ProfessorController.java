@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class ProfessorController {
     private ProfessorService service;
 
     @PostMapping
-    public ResponseEntity<Professor> create(@RequestBody Professor obj){
+    public ResponseEntity<Professor> create(@Valid @RequestBody Professor obj){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(obj));
     }
 
@@ -44,7 +45,7 @@ public class ProfessorController {
     }
 
     @PutMapping(value = "/{id_person}")
-    public ResponseEntity<Professor> update(@PathVariable Long id_person, @RequestBody Professor obj){
+    public ResponseEntity<Professor> update(@PathVariable Long id_person, @Valid @RequestBody Professor obj){
         obj.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }

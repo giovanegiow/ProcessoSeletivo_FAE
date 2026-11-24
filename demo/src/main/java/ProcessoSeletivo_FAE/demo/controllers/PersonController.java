@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 import ProcessoSeletivo_FAE.demo.entities.Person;
 import ProcessoSeletivo_FAE.demo.services.PersonService;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PersonController {
     private PersonService service;
 
     @PostMapping
-    public ResponseEntity<Person> create(@RequestBody Person obj){
+    public ResponseEntity<Person> create(@Valid @RequestBody Person obj){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(obj));
     }
 
@@ -43,7 +44,7 @@ public class PersonController {
     }
 
     @PutMapping(value = "/{id_person}")
-    public ResponseEntity<Person> update(@PathVariable Long id_person, @RequestBody Person obj){
+    public ResponseEntity<Person> update(@PathVariable Long id_person, @Valid @RequestBody Person obj){
         obj.setId(id_person);
         return ResponseEntity.ok().body(service.update(obj));
     }

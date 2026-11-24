@@ -1,6 +1,7 @@
 package ProcessoSeletivo_FAE.demo;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -44,7 +45,9 @@ class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"name":"Ana","emailAddress":"ana@email.com",
-                                 "phoneNumber":"1","status":"ACTIVE","studentNumber":2024001}
+                                 "phoneNumber":"1","status":"ACTIVE","studentNumber":2024001,
+                                 "addresses":[{"street":"Rua A, 10","city":"Curitiba","state":"PR",
+                                               "zipCode":"80000-000","country":"Brasil"}]}
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
@@ -78,5 +81,38 @@ class StudentControllerTest {
 
         mockMvc.perform(get("/student/99"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void post_comDadosInvalidos_deveRetornar400ComOsCampos() throws Exception {
+        mockMvc.perform(post("/student")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"","emailAddress":"email-invalido","status":"ACTIVE",
+                                 "addresses":[]}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.name").value("O nome é obrigatório"))
+                .andExpect(jsonPath("$.emailAddress").value("E-mail inválido"))
+                .andExpect(jsonPath("$.phoneNumber").value("O telefone é obrigatório"))
+                .andExpect(jsonPath("$.studentNumber").value("A matrícula é obrigatória"))
+                .andExpect(jsonPath("$.addresses").value("Informe pelo menos um endereço"));
+
+        // dados inválidos nem chegam ao service
+        verify(service, never()).create(any(Student.class));
+    }
+
+    @Test
+    void post_comEnderecoIncompleto_deveRetornar400() throws Exception {
+        mockMvc.perform(post("/student")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Ana","emailAddress":"ana@email.com","phoneNumber":"1",
+                                 "status":"ACTIVE","studentNumber":2024001,
+                                 "addresses":[{"street":"","city":"Curitiba","state":"PR",
+                                               "zipCode":"80000-000","country":"Brasil"}]}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$['addresses[0].street']").value("A rua é obrigatória"));
     }
 }
