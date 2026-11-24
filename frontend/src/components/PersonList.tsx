@@ -1,32 +1,31 @@
-// Tela de listagem — apenas visual. Os dados abaixo são placeholders estáticos.
+// Tela de listagem: busca as pessoas na API uma vez e filtra pela aba escolhida.
 import { useEffect, useState } from 'react';
-import { EditarPessoa } from './PersonForm';
-
-type Person = {
-  id: number;
-  name: string;
-  phoneNumber: string;
-  emailAddress: string;
-  status: 'ACTIVE' | 'DISABLE';
-  type: TypePerson
-};
+import type { Person } from '../types/Person';
 
 type TypePerson = 'PERSON' | 'STUDENT' | 'PROFESSOR';
 
-export function PersonList() {
-  const numPerson = SearchTotalPerson();
+interface PersonListProps {
+  onEdit: (pessoa: Person) => void; // avisa o App qual pessoa editar
+}
 
-  const numStudents = numPerson.filter((p) => p.type === 'STUDENT').length;
-  const numProfessors = numPerson.filter((p) => p.type === 'PROFESSOR').length;
-
+export function PersonList({ onEdit }: PersonListProps) {
+  const { pessoas, erro } = SearchTotalPerson(); // um fetch só, para tudo
   const [typeSearch, setTypeSearch] = useState<TypePerson>("PERSON");
+
+  const numStudents = pessoas.filter((p) => p.type === 'STUDENT').length;
+  const numProfessors = pessoas.filter((p) => p.type === 'PROFESSOR').length;
+
+  // O que aparece na tabela depende da aba: todos, ou só um tipo
+  const visiveis = typeSearch === 'PERSON'
+    ? pessoas
+    : pessoas.filter((p) => p.type === typeSearch);
 
   return (
     <section className="card">
       <div className="toolbar">
         <div className="tabs" role="tablist">
           <button role="tab" className={typeSearch === "PERSON" ? 'active' : ""} onClick={() => setTypeSearch('PERSON')}>
-            Todos <span className="count">{numPerson.length}</span>
+            Todos <span className="count">{pessoas.length}</span>
           </button>
           <button role="tab" className={typeSearch === "STUDENT" ? 'active' : ""} onClick={() => setTypeSearch('STUDENT')}>
             Alunos <span className="count">{numStudents}</span>
@@ -54,11 +53,10 @@ export function PersonList() {
             </tr>
           </thead>
           <tbody>
-            {typeSearch === "PERSON" ? <SearchPerson /> : typeSearch === "STUDENT" ? <SearchStudents /> : <SearchProfessor />}
+            <PersonRows pessoas={visiveis} erro={erro} onEdit={onEdit} />
           </tbody>
         </table>
       </div>
-
     </section>
   );
 }
@@ -84,20 +82,16 @@ function iniciais(nome: string) {
     .join('');
 }
 
-function SearchPerson() {
-  const [pessoas, setPessoas] = useState<Person[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
+const dinheiro = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  useEffect(() => {
-    fetch('/api/person')
-      .then((resposta) => {
-        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-        return resposta.json();
-      })
-      .then((dados: Person[]) => setPessoas(dados))
-      .catch((e) => setErro(String(e)));
-  }, []);
+interface PersonRowsProps {
+  pessoas: Person[];
+  erro: string | null;
+  onEdit: (pessoa: Person) => void;
+}
 
+// Só desenha as linhas: não busca nada, recebe a lista pronta.
+function PersonRows({ pessoas, erro, onEdit }: PersonRowsProps) {
   if (erro) {
     return (
       <tr>
@@ -109,7 +103,7 @@ function SearchPerson() {
   if (pessoas.length === 0) {
     return (
       <tr>
-        <td colSpan={7} className="empty">Nenhuma pessoa cadastrada ainda.</td>
+        <td colSpan={7} className="empty">Nenhuma pessoa encontrada.</td>
       </tr>
     );
   }
@@ -124,22 +118,29 @@ function SearchPerson() {
               <span>{pessoa.name}</span>
             </div>
           </td>
-          <td data-label="Tipo">{pessoa.type == "STUDENT" ? "Estudante" : "Professor"}</td>
+          <td data-label="Tipo">{pessoa.type === "STUDENT" ? "Estudante" : "Professor"}</td>
           <td data-label="Contato">
             <div>
               <div>{pessoa.emailAddress}</div>
               <div className="muted">{pessoa.phoneNumber}</div>
             </div>
           </td>
-          <td data-label="Detalhe">—</td>
-          <td data-label="Cidade">—</td>
+          <td data-label="Detalhe">
+            {pessoa.type === 'STUDENT'
+              ? `Matrícula ${pessoa.studentNumber}`
+              : pessoa.salary != null ? dinheiro.format(pessoa.salary) : '—'}
+          </td>
+          <td data-label="Cidade">
+            {pessoa.addresses.length > 0 ? `${pessoa.addresses[0].city}/${pessoa.addresses[0].state}` : '—'}
+          </td>
           <td data-label="Status">
             {pessoa.status === 'ACTIVE'
               ? <span className="badge badge-on">Ativo</span>
               : <span className="badge badge-off">Desativado</span>}
           </td>
           <td className="actions">
-            <button className="btn btn-ghost btn-sm" onClick={() => CarregarDadosPessoa(pessoa.id)}>Editar</button>
+            {/* A lista já tem os dados completos: é só entregar a pessoa ao App */}
+            <button className="btn btn-ghost btn-sm" onClick={() => onEdit(pessoa)}>Editar</button>
             <button className="btn btn-danger-ghost btn-sm">Excluir</button>
           </td>
         </tr>
@@ -148,134 +149,8 @@ function SearchPerson() {
   );
 }
 
-function SearchStudents() {
-  const [estudantes, setEstudante] = useState<Person[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch('/api/student')
-      .then((resposta) => {
-        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-        return resposta.json();
-      })
-      .then((dados: Person[]) => setEstudante(dados))
-      .catch((e) => setErro(String(e)));
-  }, []);
-
-  if (erro) {
-    return (
-      <tr>
-        <td colSpan={7} className="error">Erro ao buscar estudantes: {erro}</td>
-      </tr>
-    );
-  }
-
-  if (estudantes.length === 0) {
-    return (
-      <tr>
-        <td colSpan={7} className="empty">Nenhum estudante cadastrado ainda.</td>
-      </tr>
-    );
-  }
-
-  return (
-    <>
-      {estudantes.map((estudante) => (
-        <tr key={estudante.id}>
-          <td data-label="Nome">
-            <div className="person-cell">
-              <div className="avatar"><span>{iniciais(estudante.name)}</span></div>
-              <span>{estudante.name}</span>
-            </div>
-          </td>
-          <td data-label="Tipo">Estudante</td>
-          <td data-label="Contato">
-            <div>
-              <div>{estudante.emailAddress}</div>
-              <div className="muted">{estudante.phoneNumber}</div>
-            </div>
-          </td>
-          <td data-label="Detalhe">—</td>
-          <td data-label="Cidade">—</td>
-          <td data-label="Status">
-            {estudante.status === 'ACTIVE'
-              ? <span className="badge badge-on">Ativo</span>
-              : <span className="badge badge-off">Desativado</span>}
-          </td>
-          <td className="actions">
-            <button className="btn btn-ghost btn-sm">Editar</button>
-            <button className="btn btn-danger-ghost btn-sm">Excluir</button>
-          </td>
-        </tr>
-      ))}
-    </>
-  );
-}
-
-function SearchProfessor() {
-  const [professores, setProfessor] = useState<Person[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch('/api/professor')
-      .then((resposta) => {
-        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-        return resposta.json();
-      })
-      .then((dados: Person[]) => setProfessor(dados))
-      .catch((e) => setErro(String(e)));
-  }, []);
-
-  if (erro) {
-    return (
-      <tr>
-        <td colSpan={7} className="error">Erro ao buscar estudantes: {erro}</td>
-      </tr>
-    );
-  }
-
-  if (professores.length === 0) {
-    return (
-      <tr>
-        <td colSpan={7} className="empty">Nenhum estudante cadastrado ainda.</td>
-      </tr>
-    );
-  }
-
-  return (
-    <>
-      {professores.map((professor) => (
-        <tr key={professor.id}>
-          <td data-label="Nome">
-            <div className="person-cell">
-              <div className="avatar"><span>{iniciais(professor.name)}</span></div>
-              <span>{professor.name}</span>
-            </div>
-          </td>
-          <td data-label="Tipo">Professor</td>
-          <td data-label="Contato">
-            <div>
-              <div>{professor.emailAddress}</div>
-              <div className="muted">{professor.phoneNumber}</div>
-            </div>
-          </td>
-          <td data-label="Detalhe">—</td>
-          <td data-label="Cidade">—</td>
-          <td data-label="Status">
-            {professor.status === 'ACTIVE'
-              ? <span className="badge badge-on">Ativo</span>
-              : <span className="badge badge-off">Desativado</span>}
-          </td>
-          <td className="actions">
-            <button className="btn btn-ghost btn-sm">Editar</button>
-            <button className="btn btn-danger-ghost btn-sm">Excluir</button>
-          </td>
-        </tr>
-      ))}
-    </>
-  );
-}
-
+// Busca todas as pessoas uma vez. Usa hooks, então só pode ser chamada no topo
+// de um componente (é o que o PersonList faz).
 function SearchTotalPerson() {
   const [pessoas, setPessoas] = useState<Person[]>([]);
   const [erro, setErro] = useState<string | null>(null);
@@ -290,42 +165,5 @@ function SearchTotalPerson() {
       .catch((e) => setErro(String(e)));
   }, []);
 
-  if (erro) {
-    console.log("Erro ao completar requisição!");
-  }
-
-  return pessoas;
-}
-
-function CarregarDadosPessoa(id: number){
-  const [pessoas, setPessoas] = useState<Person[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/person/${id}`)
-      .then((resposta) => {
-        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-        return resposta.json();
-      })
-      .then((dados: Person[]) => setPessoas(dados))
-      .catch((e) => setErro(String(e)));
-  }, []);
-
-  if (erro) {
-    return (
-      <tr>
-        <td colSpan={7} className="error">Erro ao buscar pessoa: {erro}</td>
-      </tr>
-    );
-  }
-
-  if (pessoas.length === 0) {
-    return (
-      <tr>
-        <td colSpan={7} className="empty">Nenhuma pessoa localizada.</td>
-      </tr>
-    );
-  }
-
-  EditarPessoa(pessoas[0]);
+  return { pessoas, erro };
 }

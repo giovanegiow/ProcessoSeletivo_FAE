@@ -1,79 +1,84 @@
-// Formulário de cadastro de aluno ou professor.
+// Formulário de cadastro e edição de aluno ou professor.
+// Sem a prop "pessoa": cadastra (POST). Com a prop "pessoa": edita (PUT).
 
 import { useState } from 'react';
 import { AddressFields, emptyAddress, type Address } from './AddressFields';
+import type { Person } from '../types/Person';
 
-type Person = {
-  id: number;
-  name: string;
-  phoneNumber: string;
-  emailAddress: string;
-  status: 'ACTIVE' | 'DISABLE';
-  type: TypePerson
-};
-
-type TypePerson = 'PERSON' | 'STUDENT' | 'PROFESSOR';
+type TypePerson = 'STUDENT' | 'PROFESSOR';
 type Status = 'ACTIVE' | 'DISABLE';
 
-export function PersonForm() {
-  const [type, setType] = useState<TypePerson>('STUDENT');
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [status, setStatus] = useState<Status>("ACTIVE");
-  const [studentNumber, setStudentNumber] = useState("");
-  const [salary, setSalary] = useState("");
-  // Uma LISTA de endereços, começando com um endereço vazio (o mínimo é 1)
-  const [addresses, setAddresses] = useState<Address[]>([emptyAddress()]);
+interface PersonFormProps {
+  pessoa?: Person | null;   // pessoa que está sendo editada (opcional)
+  onCancel?: () => void;    // avisa o App que a edição foi cancelada
+}
+
+export function PersonForm({ pessoa, onCancel }: PersonFormProps) {
+  const editando = !!pessoa;   // true se recebeu uma pessoa
+
+  // Os valores iniciais vêm da pessoa (edição) ou ficam vazios (cadastro)
+  const [type, setType] = useState<TypePerson>(pessoa?.type === 'PROFESSOR' ? 'PROFESSOR' : 'STUDENT');
+  const [name, setName] = useState(pessoa?.name ?? "");
+  const [phoneNumber, setPhoneNumber] = useState(pessoa?.phoneNumber ?? "");
+  const [emailAddress, setEmailAddress] = useState(pessoa?.emailAddress ?? "");
+  const [status, setStatus] = useState<Status>(pessoa?.status ?? "ACTIVE");
+  const [studentNumber, setStudentNumber] = useState(pessoa?.studentNumber?.toString() ?? "");
+  const [salary, setSalary] = useState(pessoa?.salary?.toString() ?? "");
+  const [addresses, setAddresses] = useState<Address[]>(
+    pessoa && pessoa.addresses.length > 0 ? pessoa.addresses : [emptyAddress()]
+  );
   const [mensagem, setMensagem] = useState<string | null>(null);
 
-  async function RegisterPerson(e: React.FormEvent) {
-    e.preventDefault(); // impede o navegador de recarregar a página
+  async function SavePerson(e: React.FormEvent) {
+    e.preventDefault();
 
-    // Campos comuns + o campo específico de cada tipo
     const body = {
       name,
       phoneNumber,
       emailAddress,
       status,
-      addresses, // o backend espera "addresses" (lista), não "address"
-      // Campo vazio vai como null (Number("") daria 0 e passaria na validação)
+      addresses,
       ...(type === 'STUDENT'
         ? { studentNumber: studentNumber === '' ? null : Number(studentNumber) }
         : { salary: salary === '' ? null : Number(salary) }),
     };
 
-    const response = await fetch(type === 'STUDENT' ? '/api/student' : '/api/professor', {
-      method: 'POST',
+    const base = type === 'STUDENT' ? '/api/student' : '/api/professor';
+
+    // Cadastro: POST /api/student        Edição: PUT /api/student/5
+    const response = await fetch(editando ? `${base}/${pessoa.id}` : base, {
+      method: editando ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-
-      const erros = await response.json();
-      setMensagem('Erro ao cadastrar: ' + Object.values(erros).join(', '));
+      const erro = await response.json();
+      // 400 devolve { campo: mensagem }; 404 devolve { message: "..." }
+      setMensagem('Erro ao salvar: ' + (erro.message ?? Object.values(erro).join(', ')));
       return;
     }
 
-    setMensagem('Cadastrado com sucesso!');
-    window.location.reload();
+    window.location.reload(); // recarrega para a listagem mostrar a mudança
   }
 
   return (
-    <form className="card form" noValidate onSubmit={RegisterPerson}>
+    <form className="card form" noValidate onSubmit={SavePerson}>
       <header className="form-header">
-        <h2>Nova pessoa</h2>
+        <h2>{editando ? `Editar: ${pessoa.name}` : 'Nova pessoa'}</h2>
       </header>
 
       <fieldset className="section">
         <legend>Tipo</legend>
         <div className="segmented" role="radiogroup">
+          {/* Na edição o tipo fica travado: um aluno não vira professor */}
           <button type="button" role="radio" aria-checked={type === 'STUDENT'}
             className={type === 'STUDENT' ? 'active' : ''}
+            disabled={editando && type !== 'STUDENT'}
             onClick={() => setType('STUDENT')}>Aluno</button>
           <button type="button" role="radio" aria-checked={type === 'PROFESSOR'}
             className={type === 'PROFESSOR' ? 'active' : ''}
+            disabled={editando && type !== 'PROFESSOR'}
             onClick={() => setType('PROFESSOR')}>Professor</button>
         </div>
       </fieldset>
@@ -109,14 +114,15 @@ export function PersonForm() {
         ? <ShowStudent studentNumber={studentNumber} onChange={setStudentNumber} />
         : <ShowProfessor salary={salary} onChange={setSalary} />}
 
-      {/* O estado fica aqui no PersonForm; o AddressFields só mostra e avisa mudanças */}
       <AddressFields addresses={addresses} onChange={setAddresses} />
 
       {mensagem && <p className="muted" style={{ padding: '0 20px' }}>{mensagem}</p>}
 
       <footer className="form-footer">
-        <button type="button" className="btn btn-ghost">Cancelar</button>
-        <button type="submit" className="btn btn-primary">Cadastrar</button>
+        <button type="button" className="btn btn-ghost" onClick={onCancel}>Cancelar</button>
+        <button type="submit" className="btn btn-primary">
+          {editando ? 'Salvar alterações' : 'Cadastrar'}
+        </button>
       </footer>
     </form>
   );
@@ -157,8 +163,4 @@ function ShowProfessor({ salary, onChange }: { salary: string; onChange: (v: str
       </div>
     </fieldset>
   );
-}
-
-export function EditarPessoa(pessoa: Person){
-
 }
