@@ -9,7 +9,7 @@ interface Person {
   name: string;
   phoneNumber: string;
   emailAddress: string;
-  // address: Address;
+  address: Address;
   type: PersonType;
   status: Status;
 }
@@ -25,18 +25,47 @@ interface Address {
 type PersonType = 'STUDENT' | 'PROFESSOR';
 type Status = 'ACTIVE' | 'DISABLE';
 
-const [name, setName] = useState("");
-const [phoneNumber, setPhoneNumber] = useState("");
-const [emailAddress, setEmailAddress] = useState("");
-const [status, setStatus] = useState<Status>("ACTIVE");
-const [street, setStreet] = useState("");
-const [city, setCity] = useState("");
-const [state, setState] = useState("");
-const [zipCode, setZipCode] = useState("");
-const [country, setCountry] = useState("");
-const [type, setType] = useState<PersonType>('STUDENT');
-
 export function PersonForm() {
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [status, setStatus] = useState<Status>("ACTIVE");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [country, setCountry] = useState("");
+  const [type, setType] = useState<PersonType>('STUDENT');
+
+  async function RegisterPerson() {
+    const body: Person = {
+      name: name,
+      emailAddress: emailAddress,
+      phoneNumber: phoneNumber,
+      status: status,
+      type: type,
+      address: {
+        street: street,
+        city: city,
+        state: state,
+        zipCode: zipCode,
+        country: country
+      }
+    }
+
+    const response = await fetch(type === 'STUDENT' ? '/api/student' : '/api/professor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ body }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+  }
+  
   return (
     <form className="card form" noValidate>
       <header className="form-header">
@@ -124,26 +153,4 @@ function ShowProfessor() {
       </div>
     </fieldset>
   )
-}
-
-async function RegisterPerson() {
-  const body: Person = {
-    name: name,
-    emailAddress: emailAddress,
-    phoneNumber: phoneNumber,
-    status: status,
-    type: type
-  }
-
-  const response = await fetch('/api/person', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ body }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Erro HTTP: ${response.status}`);
-  }
 }

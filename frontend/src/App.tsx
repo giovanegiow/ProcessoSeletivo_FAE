@@ -1,7 +1,7 @@
 // Vitrine das telas. Não há navegação nem estado: todas as telas são renderizadas
 // em sequência para visualização. Substitua pela sua lógica/roteamento.
 
-import { PersonList, PersonListEmpty } from './components/PersonList';
+import { PersonList } from './components/PersonList';
 import { PersonForm } from './components/PersonForm';
 // import { ConfirmDialog } from "./components/ConfirmDialog";
 
