@@ -1,11 +1,12 @@
 package ProcessoSeletivo_FAE.demo.services;
 
 import java.util.List;
-import java.util.Optional;
 import ProcessoSeletivo_FAE.demo.entities.Professor;
 import ProcessoSeletivo_FAE.demo.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 
@@ -19,12 +20,15 @@ public class ProfessorService {
     }
 
     public void delete(Long id_person){
+        if (!repository.existsById(id_person)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado");
+        }
         repository.deleteById(id_person);
     }
 
     public Professor selectById(Long id_person){
-        Optional<Professor> obj = repository.findById(id_person);
-        return obj.get();
+        return repository.findById(id_person)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
     }
 
     public List<Professor> selectAll(){
@@ -32,17 +36,17 @@ public class ProfessorService {
     }
 
     public Professor update(Professor obj){
-        Optional<Professor> newObj = repository.findById(obj.getId());
-        updateProfessor(newObj, obj);
-        return repository.save(newObj.get());
+        Professor entity = selectById(obj.getId());
+        updateProfessor(entity, obj);
+        return repository.save(entity);
     }
 
-    private void updateProfessor(Optional<Professor> newObj, Professor obj){
-        newObj.get().setName(obj.getName());
-        newObj.get().setPhoneNumber(obj.getPhoneNumber());
-        newObj.get().setEmailAddress(obj.getEmailAddress());
-        newObj.get().setStatus(obj.getStatus());
-        newObj.get().replaceAddresses(obj.getAddresses());
-        newObj.get().setSalary(obj.getSalary());
+    private void updateProfessor(Professor entity, Professor obj){
+        entity.setName(obj.getName());
+        entity.setPhoneNumber(obj.getPhoneNumber());
+        entity.setEmailAddress(obj.getEmailAddress());
+        entity.setStatus(obj.getStatus());
+        entity.replaceAddresses(obj.getAddresses());
+        entity.setSalary(obj.getSalary());
     }
 }

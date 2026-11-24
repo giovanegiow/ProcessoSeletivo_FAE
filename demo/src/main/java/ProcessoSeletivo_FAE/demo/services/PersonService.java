@@ -1,11 +1,12 @@
 package ProcessoSeletivo_FAE.demo.services;
 
 import java.util.List;
-import java.util.Optional;
 import ProcessoSeletivo_FAE.demo.entities.Person;
 import ProcessoSeletivo_FAE.demo.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 
@@ -19,12 +20,15 @@ public class PersonService {
     }
 
     public void delete(Long id_person){
+        if (!repository.existsById(id_person)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada");
+        }
         repository.deleteById(id_person);
     }
 
     public Person selectById(Long id_person){
-        Optional<Person> obj = repository.findById(id_person);
-        return obj.get();
+        return repository.findById(id_person)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
     }
 
     public List<Person> selectAll(){
@@ -32,18 +36,16 @@ public class PersonService {
     }
 
     public Person update(Person obj){
-        Optional<Person> newObj = repository.findById(obj.getId());
-        updatePerson(newObj, obj);
-        return repository.save(newObj.get());
+        Person entity = selectById(obj.getId());
+        updatePerson(entity, obj);
+        return repository.save(entity);
     }
 
-    private void updatePerson(Optional<Person> newObj, Person obj){
-        newObj.get().setName(obj.getName());
-        newObj.get().setPhoneNumber(obj.getPhoneNumber());
-        newObj.get().setEmailAddress(obj.getEmailAddress());
-        newObj.get().setStatus(obj.getStatus());
-
-        newObj.get().setStatus(obj.getStatus());
-        newObj.get().replaceAddresses(obj.getAddresses());
+    private void updatePerson(Person entity, Person obj){
+        entity.setName(obj.getName());
+        entity.setPhoneNumber(obj.getPhoneNumber());
+        entity.setEmailAddress(obj.getEmailAddress());
+        entity.setStatus(obj.getStatus());
+        entity.replaceAddresses(obj.getAddresses());
     }
 }

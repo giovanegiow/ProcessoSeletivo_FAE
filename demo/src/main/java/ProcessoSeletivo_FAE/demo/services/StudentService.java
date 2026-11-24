@@ -1,11 +1,12 @@
 package ProcessoSeletivo_FAE.demo.services;
 
 import java.util.List;
-import java.util.Optional;
 import ProcessoSeletivo_FAE.demo.entities.Student;
 import ProcessoSeletivo_FAE.demo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 
@@ -19,12 +20,15 @@ public class StudentService {
     }
 
     public void delete(Long id_person){
+        if (!repository.existsById(id_person)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado");
+        }
         repository.deleteById(id_person);
     }
 
     public Student selectById(Long id_person){
-        Optional<Student> obj = repository.findById(id_person);
-        return obj.get();
+        return repository.findById(id_person)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
     }
 
     public List<Student> selectAll(){
@@ -32,19 +36,18 @@ public class StudentService {
     }
 
     public Student update(Student obj){
-        Optional<Student> newObj = repository.findById(obj.getId());
-        updateStudent(newObj, obj);
-        return repository.save(newObj.get());
+        Student entity = selectById(obj.getId());
+        updateStudent(entity, obj);
+        return repository.save(entity);
     }
 
-    private void updateStudent(Optional<Student> newObj, Student obj){
-        newObj.get().setName(obj.getName());
-        newObj.get().setPhoneNumber(obj.getPhoneNumber());
-        newObj.get().setEmailAddress(obj.getEmailAddress());
-        newObj.get().setStatus(obj.getStatus());
-        newObj.get().setStatus(obj.getStatus());
-        newObj.get().replaceAddresses(obj.getAddresses());
-        newObj.get().setStudentNumber(obj.getStudentNumber());
-        newObj.get().setPhoto(obj.getPhoto());
+    private void updateStudent(Student entity, Student obj){
+        entity.setName(obj.getName());
+        entity.setPhoneNumber(obj.getPhoneNumber());
+        entity.setEmailAddress(obj.getEmailAddress());
+        entity.setStatus(obj.getStatus());
+        entity.replaceAddresses(obj.getAddresses());
+        entity.setStudentNumber(obj.getStudentNumber());
+        entity.setPhoto(obj.getPhoto());
     }
 }

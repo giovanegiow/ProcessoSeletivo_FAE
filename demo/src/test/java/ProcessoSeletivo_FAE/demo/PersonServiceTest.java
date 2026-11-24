@@ -3,10 +3,11 @@ package ProcessoSeletivo_FAE.demo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.NoSuchElementException;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class PersonServiceTest {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.selectById(99L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ResponseStatusException.class);
     }
 
     @Test
@@ -78,8 +79,31 @@ class PersonServiceTest {
 
     @Test
     void delete_deveChamarORepositorio() {
+        when(repository.existsById(1L)).thenReturn(true);
+
         service.delete(1L);
 
         verify(repository).deleteById(1L);
+    }
+
+    @Test
+    void delete_quandoNaoExiste_lancaExcecaoENaoApaga() {
+        when(repository.existsById(99L)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.delete(99L))
+                .isInstanceOf(ResponseStatusException.class);
+
+        verify(repository, never()).deleteById(99L);
+    }
+
+    @Test
+    void update_quandoNaoExiste_lancaExcecao() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        Person alterado = new Person();
+        alterado.setId(99L);
+
+        assertThatThrownBy(() -> service.update(alterado))
+                .isInstanceOf(ResponseStatusException.class);
     }
 }
