@@ -3,7 +3,6 @@ package ProcessoSeletivo_FAE.demo.services;
 import java.util.List;
 import java.util.Optional;
 import ProcessoSeletivo_FAE.demo.entities.Person;
-import ProcessoSeletivo_FAE.demo.entities.Student;
 import ProcessoSeletivo_FAE.demo.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ public class PersonService {
     @Autowired 
     private PersonRepository repository;
 
-    public Student create(Student obj){
+    public Person create(Person obj){
         obj.replaceAddresses(obj.getAddresses());
         return repository.save(obj);
     }

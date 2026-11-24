@@ -14,6 +14,7 @@ public class ProfessorService {
     private ProfessorRepository repository;
 
     public Professor create(Professor obj){
+        obj.replaceAddresses(obj.getAddresses());
         return repository.save(obj);
     }
 
@@ -40,7 +41,6 @@ public class ProfessorService {
         newObj.get().setName(obj.getName());
         newObj.get().setPhoneNumber(obj.getPhoneNumber());
         newObj.get().setEmailAddress(obj.getEmailAddress());
-        newObj.get().setStatus(obj.getStatus());
         newObj.get().setStatus(obj.getStatus());
         newObj.get().replaceAddresses(obj.getAddresses());
         newObj.get().setSalary(obj.getSalary());

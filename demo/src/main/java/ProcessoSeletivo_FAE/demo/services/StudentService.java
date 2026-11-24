@@ -14,6 +14,7 @@ public class StudentService {
     private StudentRepository repository;
 
     public Student create(Student obj){
+        obj.replaceAddresses(obj.getAddresses());
         return repository.save(obj);
     }
 
