@@ -10,5 +10,6 @@ export type Person = {
   type: 'PERSON' | 'STUDENT' | 'PROFESSOR';
   addresses: Address[];
   studentNumber?: number | null; // só existe em aluno
+  photo?: string | null;         // só existe em aluno (imagem em base64)
   salary?: number | null;        // só existe em professor
 };

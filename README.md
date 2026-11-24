@@ -128,6 +128,8 @@ atualizados e removidos junto com a pessoa (`cascade` e `orphanRemoval`).
 - **`Long` como id:** comporta um volume muito maior de registros que `int` e, por
   ser um objeto, pode ser `null` antes de a entidade ser salva.
 - **`BigDecimal` no salário:** evita os erros de arredondamento de `float` e `double`.
+- **Foto do aluno:** o front converte a imagem em texto (base64) e ela é enviada no
+  próprio JSON do aluno, gravada numa coluna de texto grande (`@Lob`), com limite de 1 MB.
 - **Validação:** regras como campos obrigatórios, formato de e-mail, salário positivo
   e pelo menos um endereço são verificadas antes de chegar ao banco.
 
@@ -135,5 +137,6 @@ atualizados e removidos junto com a pessoa (`cascade` e `orphanRemoval`).
 
 - Usar DTOs em vez de expor as entidades diretamente na API
 - Documentação interativa com Swagger/OpenAPI
-- Upload de foto do aluno
+- Guardar as fotos num serviço de arquivos (ex.: Amazon S3) e salvar só o endereço
+  no banco, em vez da imagem inteira
 - Banco de dados persistente (ex.: PostgreSQL)

@@ -24,6 +24,7 @@ export function PersonForm({ pessoa, onCancel }: PersonFormProps) {
   const [status, setStatus] = useState<Status>(pessoa?.status ?? "ACTIVE");
   const [studentNumber, setStudentNumber] = useState(pessoa?.studentNumber?.toString() ?? "");
   const [salary, setSalary] = useState(pessoa?.salary?.toString() ?? "");
+  const [photo, setPhoto] = useState<string | null>(pessoa?.photo ?? null);
   const [addresses, setAddresses] = useState<Address[]>(
     pessoa && pessoa.addresses.length > 0 ? pessoa.addresses : [emptyAddress()]
   );
@@ -39,7 +40,7 @@ export function PersonForm({ pessoa, onCancel }: PersonFormProps) {
       status,
       addresses,
       ...(type === 'STUDENT'
-        ? { studentNumber: studentNumber === '' ? null : Number(studentNumber) }
+        ? { studentNumber: studentNumber === '' ? null : Number(studentNumber), photo }
         : { salary: salary === '' ? null : Number(salary) }),
     };
 
@@ -111,7 +112,8 @@ export function PersonForm({ pessoa, onCancel }: PersonFormProps) {
       </fieldset>
 
       {type === 'STUDENT'
-        ? <ShowStudent studentNumber={studentNumber} onChange={setStudentNumber} />
+        ? <ShowStudent studentNumber={studentNumber} onChange={setStudentNumber}
+            photo={photo} onPhotoChange={setPhoto} />
         : <ShowProfessor salary={salary} onChange={setSalary} />}
 
       <AddressFields addresses={addresses} onChange={setAddresses} />
@@ -128,17 +130,57 @@ export function PersonForm({ pessoa, onCancel }: PersonFormProps) {
   );
 }
 
-function ShowStudent({ studentNumber, onChange }: { studentNumber: string; onChange: (v: string) => void }) {
+const MAX_PHOTO_BYTES = 1024 * 1024; // 1 MB (o backend recusa acima disso)
+
+interface ShowStudentProps {
+  studentNumber: string;
+  onChange: (v: string) => void;
+  photo: string | null;
+  onPhotoChange: (photo: string | null) => void;
+}
+
+function ShowStudent({ studentNumber, onChange, photo, onPhotoChange }: ShowStudentProps) {
+  const [erroFoto, setErroFoto] = useState<string | null>(null);
+
+  // Lê a imagem escolhida e transforma em texto (data URL em base64),
+  // que vai no JSON do aluno e pode ser usado direto no <img src>.
+  function escolherFoto(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setErroFoto('O arquivo precisa ser uma imagem');
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setErroFoto('A imagem deve ter no máximo 1 MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setErroFoto(null);
+      onPhotoChange(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
   return (
     <fieldset className="section">
       <legend>Dados do aluno</legend>
       <div className="student-grid">
         <div className="photo-picker">
-          <div className="avatar avatar-lg"><span>?</span></div>
+          <div className="avatar avatar-lg">
+            {photo ? <img src={photo} alt="Foto do aluno" /> : <span>?</span>}
+          </div>
           <label className="btn btn-secondary btn-sm file-btn">
-            Enviar foto
-            <input type="file" name="photo" accept="image/*" />
+            {photo ? 'Trocar foto' : 'Enviar foto'}
+            <input type="file" name="photo" accept="image/*"
+              onChange={(e) => escolherFoto(e.target.files?.[0])} />
           </label>
+          {photo && (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onPhotoChange(null)}>
+              Remover foto
+            </button>
+          )}
+          {erroFoto && <small className="error">{erroFoto}</small>}
         </div>
         <label>
           Matrícula (studentNumber)

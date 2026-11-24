@@ -114,4 +114,20 @@ class StudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$['addresses[0].street']").value("A rua é obrigatória"));
     }
+
+    @Test
+    void post_comFotoGrandeDemais_deveRetornar400() throws Exception {
+        String fotoGigante = "data:image/png;base64," + "A".repeat(1_600_000);
+
+        mockMvc.perform(post("/student")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Ana","emailAddress":"ana@email.com","phoneNumber":"1",
+                                 "status":"ACTIVE","studentNumber":2024001,"photo":"%s",
+                                 "addresses":[{"street":"Rua A, 10","city":"Curitiba","state":"PR",
+                                               "zipCode":"80000-000","country":"Brasil"}]}
+                                """.formatted(fotoGigante)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.photo").value("A foto deve ter no máximo 1 MB"));
+    }
 }

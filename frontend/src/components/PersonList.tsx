@@ -116,7 +116,11 @@ function PersonRows({ pessoas, erro, onEdit }: PersonRowsProps) {
         <tr key={pessoa.id}>
           <td data-label="Nome">
             <div className="person-cell">
-              <div className="avatar"><span>{iniciais(pessoa.name)}</span></div>
+              <div className="avatar">
+                {pessoa.photo
+                  ? <img src={pessoa.photo} alt="" />
+                  : <span>{iniciais(pessoa.name)}</span>}
+              </div>
               <span>{pessoa.name}</span>
             </div>
           </td>
