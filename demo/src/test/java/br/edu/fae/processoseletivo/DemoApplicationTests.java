@@ -1,4 +1,4 @@
-package ProcessoSeletivo_FAE.demo;
+package br.edu.fae.processoseletivo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
