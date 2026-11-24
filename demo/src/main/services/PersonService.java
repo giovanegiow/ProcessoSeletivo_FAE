@@ -1,0 +1,36 @@
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+
+public class PersonService {
+    @Autowired 
+    private PersonRepository repository;
+
+    public Person create(Person obj){
+        return repository.save(obj);
+    }
+
+    public void delete(Long id_person){
+        repository.deleteById(id_person);
+    }
+
+    public Person selectById(Long id_person){
+        Optional<Person> obj = repository.findById(id_person);
+        return obj.get();
+    }
+
+    public List<Person> selectAll(){
+        return repository.findAll();
+    }
+
+    public Person update(Person obj){
+        Optional<Person> newObj = repository.findById(obj.getId());
+        updatePerson(newObj, obj);
+        return repository.save(newObj.get());
+    }
+
+    private void updatePerson(Optional<Person> newObj, Person obj){
+        newObj.get().setName(obj.getName());
+    }
+}

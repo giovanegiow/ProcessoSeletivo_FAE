@@ -1,4 +1,4 @@
-package br.edu.fae.processoseletivo;
+package ProcessoSeletivo_FAE.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
