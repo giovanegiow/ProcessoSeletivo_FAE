@@ -77,4 +77,11 @@ class StudentServiceTest {
 
         assertThat(atualizado.getName()).isEqualTo("Ana Souza");
     }
+
+    @Test
+    void delete_deveChamarORepositorio() {
+        service.delete(1L);
+
+        verify(repository).deleteById(1L);
+    }
 }

@@ -6,6 +6,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,14 +21,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-@AllArgsConstructor 
-@NoArgsConstructor 
-@Getter 
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Setter
 @EqualsAndHashCode(of = "id")
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED) 
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Person implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +41,19 @@ public class Person implements Serializable {
     @Column(nullable = false)
     private Status status;
 
-    public String getType() {          
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
+    public void replaceAddresses(List<Address> newAddresses) {
+        List<Address> copy = new ArrayList<>(newAddresses == null ? List.of() : newAddresses);
+        addresses.clear();
+        for (Address address : copy) {
+            address.setPerson(this);
+            addresses.add(address);
+        }
+    }
+
+    public String getType() {
         return "PERSON";
     }
 }

@@ -2,6 +2,10 @@ package ProcessoSeletivo_FAE.demo.entities;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,4 +32,9 @@ public class Address implements Serializable {
     private String state;
     private String zipCode;
     private String country;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 }
