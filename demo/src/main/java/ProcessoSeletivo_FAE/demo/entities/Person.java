@@ -1,5 +1,9 @@
 package ProcessoSeletivo_FAE.demo.entities;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;

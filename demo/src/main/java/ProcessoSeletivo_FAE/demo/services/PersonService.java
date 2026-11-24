@@ -1,5 +1,9 @@
 package ProcessoSeletivo_FAE.demo.services;
 
+import java.util.List;
+import java.util.Optional;
+import ProcessoSeletivo_FAE.demo.entities.Person;
+import ProcessoSeletivo_FAE.demo.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

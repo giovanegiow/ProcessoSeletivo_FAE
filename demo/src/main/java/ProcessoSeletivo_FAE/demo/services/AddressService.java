@@ -1,5 +1,8 @@
 package ProcessoSeletivo_FAE.demo.services;
 
+import java.util.Optional;
+import ProcessoSeletivo_FAE.demo.entities.Address;
+import ProcessoSeletivo_FAE.demo.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
