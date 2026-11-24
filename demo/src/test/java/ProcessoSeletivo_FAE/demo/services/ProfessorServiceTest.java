@@ -1,4 +1,4 @@
-package ProcessoSeletivo_FAE.demo;
+package ProcessoSeletivo_FAE.demo.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import ProcessoSeletivo_FAE.demo.entities.Status;
 import ProcessoSeletivo_FAE.demo.entities.Professor;
 import ProcessoSeletivo_FAE.demo.repository.ProfessorRepository;
-import ProcessoSeletivo_FAE.demo.services.ProfessorService;
 
 @ExtendWith(MockitoExtension.class)
 class ProfessorServiceTest {

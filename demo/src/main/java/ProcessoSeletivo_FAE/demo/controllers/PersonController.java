@@ -39,6 +39,11 @@ public class PersonController {
         return ResponseEntity.ok().body(service.selectByName(name));
     }
 
+    @GetMapping(value = "/{id_person}")
+    public ResponseEntity<Person> selectById(@PathVariable Long id_person){
+        return ResponseEntity.ok().body(service.selectById(id_person));
+    }
+
     @GetMapping 
     public ResponseEntity<List<Person>> selectAll(){
         return ResponseEntity.ok().body(service.selectAll());

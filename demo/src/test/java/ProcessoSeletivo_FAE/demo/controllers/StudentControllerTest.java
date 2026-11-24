@@ -1,4 +1,4 @@
-package ProcessoSeletivo_FAE.demo;
+package ProcessoSeletivo_FAE.demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import ProcessoSeletivo_FAE.demo.controllers.StudentController;
 import ProcessoSeletivo_FAE.demo.entities.Status;
 import ProcessoSeletivo_FAE.demo.entities.Student;
 import ProcessoSeletivo_FAE.demo.services.StudentService;

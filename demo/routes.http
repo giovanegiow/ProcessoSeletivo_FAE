@@ -125,17 +125,23 @@ GET {{baseUrl}}/person
 ### 10. Buscar pessoa por id - aqui o 2 é a professora (espera 200)
 GET {{baseUrl}}/person/2
 
+### 11. Buscar pessoas pelo nome - acha "Ana Souza Lima" (espera 200 com uma lista)
+GET {{baseUrl}}/person/search?name=ana
+
+### 12. Busca sem resultado (espera 200 com [] - buscar e não achar não é erro)
+GET {{baseUrl}}/person/search?name=xyz
+
 # =====================================================================
 # ERROS - 404 (id não existe)
 # =====================================================================
 
-### 11. Buscar aluno que não existe (espera 404)
+### 13. Buscar aluno que não existe (espera 404)
 GET {{baseUrl}}/student/999
 
-### 12. Buscar como aluno um id que é de professor (espera 404)
+### 14. Buscar como aluno um id que é de professor (espera 404)
 GET {{baseUrl}}/student/2
 
-### 13. Editar professor que não existe (espera 404)
+### 15. Editar professor que não existe (espera 404)
 PUT {{baseUrl}}/professor/999
 Content-Type: application/json
 
@@ -156,20 +162,20 @@ Content-Type: application/json
   ]
 }
 
-### 14. Apagar aluno que não existe (espera 404)
+### 16. Apagar aluno que não existe (espera 404)
 DELETE {{baseUrl}}/student/999
 
 # =====================================================================
 # ERROS - 400 (dados inválidos)
 # =====================================================================
 
-### 15. Criar aluno sem nada (espera 400 com todos os campos obrigatórios)
+### 17. Criar aluno sem nada (espera 400 com todos os campos obrigatórios)
 POST {{baseUrl}}/student
 Content-Type: application/json
 
 {}
 
-### 16. E-mail inválido e sem endereço (espera 400)
+### 18. E-mail inválido e sem endereço (espera 400)
 POST {{baseUrl}}/student
 Content-Type: application/json
 
@@ -182,7 +188,7 @@ Content-Type: application/json
   "addresses": []
 }
 
-### 17. Endereço incompleto, sem cidade (espera 400)
+### 19. Endereço incompleto, sem cidade (espera 400)
 POST {{baseUrl}}/student
 Content-Type: application/json
 
@@ -202,7 +208,7 @@ Content-Type: application/json
   ]
 }
 
-### 18. Professor com salário negativo (espera 400)
+### 20. Professor com salário negativo (espera 400)
 POST {{baseUrl}}/professor
 Content-Type: application/json
 
@@ -223,7 +229,7 @@ Content-Type: application/json
   ]
 }
 
-### 19. Status que não existe no enum (espera 400)
+### 21. Status que não existe no enum (espera 400)
 POST {{baseUrl}}/student
 Content-Type: application/json
 
@@ -248,11 +254,11 @@ Content-Type: application/json
 # APAGAR (por último, para não atrapalhar os testes acima)
 # =====================================================================
 
-### 20. Apagar aluno - os endereços dele vão junto (espera 204)
+### 22. Apagar aluno - os endereços dele vão junto (espera 204)
 DELETE {{baseUrl}}/student/1
 
-### 21. Apagar professor (espera 204)
+### 23. Apagar professor (espera 204)
 DELETE {{baseUrl}}/professor/2
 
-### 22. Listar de novo - deve voltar vazio (espera 200 com [])
+### 24. Listar de novo - deve voltar vazio (espera 200 com [])
 GET {{baseUrl}}/person

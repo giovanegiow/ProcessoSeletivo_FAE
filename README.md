@@ -81,6 +81,8 @@ extensão **REST Client** e clique em "Send Request" acima de cada requisição.
 | DELETE | `/professor/{id}` | Remove um professor |
 | GET | `/person` | Lista todas as pessoas (alunos e professores) |
 | GET | `/person/{id}` | Busca uma pessoa |
+| GET | `/person/search?name=ana` | Busca pessoas cujo nome contém o texto (sem diferenciar maiúsculas) |
+| DELETE | `/person/{id}` | Remove uma pessoa (aluno ou professor) |
 
 Respostas de erro:
 - **400** — dados inválidos (a resposta indica cada campo e o motivo)

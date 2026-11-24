@@ -1,4 +1,4 @@
-package ProcessoSeletivo_FAE.demo;
+package ProcessoSeletivo_FAE.demo.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,44 +17,45 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ProcessoSeletivo_FAE.demo.entities.Status;
-import ProcessoSeletivo_FAE.demo.entities.Person;
-import ProcessoSeletivo_FAE.demo.repository.PersonRepository;
-import ProcessoSeletivo_FAE.demo.services.PersonService;
+import ProcessoSeletivo_FAE.demo.entities.Student;
+import ProcessoSeletivo_FAE.demo.repository.StudentRepository;
 
 @ExtendWith(MockitoExtension.class)
-class PersonServiceTest {
+class StudentServiceTest {
+
     @Mock
-    private PersonRepository repository;
+    private StudentRepository repository;
 
     @InjectMocks
-    private PersonService service;
+    private StudentService service;
 
-    private Person pessoa(Long id, String nome){
-        Person p = new Person();
-        p.setId(id);
-        p.setName(nome);
-        p.setEmailAddress("pessoa@email.com");
-        p.setPhoneNumber("(41) 99999-1212");
-        p.setStatus(Status.ACTIVE);
-        return p;
+    private Student aluno(Long id, String nome) {
+        Student s = new Student();
+        s.setId(id);
+        s.setName(nome);
+        s.setEmailAddress("aluno@email.com");
+        s.setPhoneNumber("(41) 99999-1234");
+        s.setStatus(Status.ACTIVE);
+        s.setStudentNumber(2024001L);
+        return s;
     }
 
     @Test
-    void create_deveSalvarERetornarAPessoa() {
-        Person novo = pessoa(null, "Ana");
-        when(repository.save(novo)).thenReturn(pessoa(1L, "Ana"));
+    void create_deveSalvarERetornarOAluno() {
+        Student novo = aluno(null, "Ana");
+        when(repository.save(novo)).thenReturn(aluno(1L, "Ana"));
 
-        Person salvo = service.create(novo);
+        Student salvo = service.create(novo);
 
         assertThat(salvo.getId()).isEqualTo(1L);
         verify(repository).save(novo);
     }
 
     @Test
-    void selectById_quandoExiste_deveRetornarAPessoa() {
-        when(repository.findById(1L)).thenReturn(Optional.of(pessoa(1L, "Ana")));
+    void selectById_quandoExiste_deveRetornarOAluno() {
+        when(repository.findById(1L)).thenReturn(Optional.of(aluno(1L, "Ana")));
 
-        Person encontrado = service.selectById(1L);
+        Student encontrado = service.selectById(1L);
 
         assertThat(encontrado.getName()).isEqualTo("Ana");
     }
@@ -69,10 +70,10 @@ class PersonServiceTest {
 
     @Test
     void update_deveAtualizarONome() {
-        when(repository.findById(1L)).thenReturn(Optional.of(pessoa(1L, "Ana")));
-        when(repository.save(any(Person.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(repository.findById(1L)).thenReturn(Optional.of(aluno(1L, "Ana")));
+        when(repository.save(any(Student.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Person atualizado = service.update(pessoa(1L, "Ana Souza"));
+        Student atualizado = service.update(aluno(1L, "Ana Souza"));
 
         assertThat(atualizado.getName()).isEqualTo("Ana Souza");
     }
@@ -100,7 +101,7 @@ class PersonServiceTest {
     void update_quandoNaoExiste_lancaExcecao() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        Person alterado = new Person();
+        Student alterado = new Student();
         alterado.setId(99L);
 
         assertThatThrownBy(() -> service.update(alterado))

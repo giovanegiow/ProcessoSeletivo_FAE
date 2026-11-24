@@ -169,14 +169,19 @@ function SearchTotalPerson() {
 }
 
 async function onExcluirPessoa(pessoa: Person){
+  // Pede confirmação: excluir apaga a pessoa e todos os endereços dela
+  if (!confirm(`Excluir ${pessoa.name}?`)) return;
+
   const response = await fetch(`/api/person/${pessoa.id}`, {
-      method: 'DELETE',
-    });
+    method: 'DELETE',
+  });
 
   if (response.ok){
-    alert("Pessoa excluida com sucesso!");
+    alert("Pessoa excluída com sucesso!");
     window.location.reload();
   } else {
-    alert("Erro ao excluir pessoa. Motivo: " + response.json());
+    // response.json() devolve uma Promise: precisa do await para ler o conteúdo
+    const erro = await response.json();
+    alert("Erro ao excluir pessoa. Motivo: " + erro.message);
   }
 }
