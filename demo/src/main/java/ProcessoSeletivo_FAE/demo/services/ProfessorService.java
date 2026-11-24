@@ -37,6 +37,6 @@ public class ProfessorService {
     }
 
     private void updateProfessor(Optional<Professor> newObj, Professor obj){
-        newObj.get().setName(obj.getName());
+        newObj.get().setSalary(obj.getSalary());
     }
 }

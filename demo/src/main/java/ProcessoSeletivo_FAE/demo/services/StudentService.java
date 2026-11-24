@@ -37,6 +37,7 @@ public class StudentService {
     }
 
     private void updateStudent(Optional<Student> newObj, Student obj){
-        newObj.get().setName(obj.getName());
+        newObj.get().setStudentNumber(obj.getStudentNumber());
+        newObj.get().setPhoto(obj.getPhoto());
     }
 }

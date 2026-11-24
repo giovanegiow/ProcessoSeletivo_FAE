@@ -32,6 +32,10 @@ public class AddressService {
     }
 
     private void updateAddress(Optional<Address> newObj, Address obj){
-        newObj.get().setName(obj.getName());
+        newObj.get().setStreet(obj.getStreet());
+        newObj.get().setCity(obj.getCity());
+        newObj.get().setState(obj.getState());
+        newObj.get().setZipCode(obj.getZipCode());
+        newObj.get().setCountry(obj.getCountry());
     }
 }
