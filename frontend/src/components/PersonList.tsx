@@ -15,10 +15,11 @@ export function PersonList({ onEdit }: PersonListProps) {
   const numStudents = pessoas.filter((p) => p.type === 'STUDENT').length;
   const numProfessors = pessoas.filter((p) => p.type === 'PROFESSOR').length;
 
-  // O que aparece na tabela depende da aba: todos, ou só um tipo
-  const visiveis = typeSearch === 'PERSON'
-    ? pessoas
-    : pessoas.filter((p) => p.type === typeSearch);
+  const [busca, setBusca] = useState('');
+
+  const visiveis = pessoas
+    .filter((p) => typeSearch === 'PERSON' || p.type === typeSearch)
+    .filter((p) => p.name.toLowerCase().includes(busca.toLowerCase()));    
 
   return (
     <section className="card">
@@ -35,8 +36,9 @@ export function PersonList({ onEdit }: PersonListProps) {
           </button>
         </div>
         <div className="toolbar-right">
-          <input type="search" className="search" placeholder="Buscar por nome, e-mail ou matrícula" />
-          <button className="btn btn-primary">+ Nova pessoa</button>
+          <input type="search" className="search" placeholder="Buscar por nome"
+            value={busca} onChange={(e) => setBusca(e.target.value)} />
+          {/* <button className="btn btn-primary">+ Nova pessoa</button> */}
         </div>
       </div>
       <div className="table-wrap">
@@ -141,7 +143,7 @@ function PersonRows({ pessoas, erro, onEdit }: PersonRowsProps) {
           <td className="actions">
             {/* A lista já tem os dados completos: é só entregar a pessoa ao App */}
             <button className="btn btn-ghost btn-sm" onClick={() => onEdit(pessoa)}>Editar</button>
-            <button className="btn btn-danger-ghost btn-sm">Excluir</button>
+            <button className="btn btn-danger-ghost btn-sm" onClick={() => onExcluirPessoa(pessoa)}>Excluir</button>
           </td>
         </tr>
       ))}
@@ -149,8 +151,6 @@ function PersonRows({ pessoas, erro, onEdit }: PersonRowsProps) {
   );
 }
 
-// Busca todas as pessoas uma vez. Usa hooks, então só pode ser chamada no topo
-// de um componente (é o que o PersonList faz).
 function SearchTotalPerson() {
   const [pessoas, setPessoas] = useState<Person[]>([]);
   const [erro, setErro] = useState<string | null>(null);
@@ -166,4 +166,17 @@ function SearchTotalPerson() {
   }, []);
 
   return { pessoas, erro };
+}
+
+async function onExcluirPessoa(pessoa: Person){
+  const response = await fetch(`/api/person/${pessoa.id}`, {
+      method: 'DELETE',
+    });
+
+  if (response.ok){
+    alert("Pessoa excluida com sucesso!");
+    window.location.reload();
+  } else {
+    alert("Erro ao excluir pessoa. Motivo: " + response.json());
+  }
 }

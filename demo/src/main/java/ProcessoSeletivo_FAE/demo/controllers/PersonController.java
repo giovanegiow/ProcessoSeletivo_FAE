@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping(value = "/person")
@@ -33,9 +34,9 @@ public class PersonController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/{id_person}")
-    public ResponseEntity<Person> selectById(@PathVariable  Long id_person){
-        return ResponseEntity.ok().body(service.selectById(id_person));
+    @GetMapping(value = "/search")
+    public ResponseEntity<List<Person>> selectByName(@RequestParam String name){
+        return ResponseEntity.ok().body(service.selectByName(name));
     }
 
     @GetMapping 

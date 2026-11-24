@@ -31,6 +31,10 @@ public class PersonService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
     }
 
+    public List<Person> selectByName(String name){
+        return repository.findByNameContainingIgnoreCase(name);
+    }
+
     public List<Person> selectAll(){
         return repository.findAll();
     }
