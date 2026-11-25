@@ -185,7 +185,7 @@ function ShowStudent({ studentNumber, onChange, photo, onPhotoChange }: ShowStud
         <label>
           Matrícula (studentNumber)
           <input name="studentNumber" inputMode="numeric" value={studentNumber}
-            onChange={(e) => onChange(e.target.value)} />
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))} />
         </label>
       </div>
     </fieldset>
